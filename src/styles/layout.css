@@ -1,0 +1,466 @@
+/* ==========================================================================
+   Каркас: левое меню | зона | нижняя панель плеера; фон; полноэкранный плеер.
+   ========================================================================== */
+
+.shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 14px;
+  height: 100%;
+  padding: 14px;
+  transition:
+    grid-template-columns 0.45s var(--ease-out),
+    opacity 0.35s var(--ease-out),
+    transform 0.5s var(--ease-out),
+    visibility 0s;
+}
+
+/* левое меню свёрнуто до иконок */
+.shell.sidebar-collapsed {
+  grid-template-columns: 78px minmax(0, 1fr);
+}
+
+/* Под полноэкранным плеером основной интерфейс прячем полностью —
+   видеокарте не нужно рисовать то, что всё равно не видно */
+.shell.is-covered {
+  opacity: 0;
+  transform: scale(0.97);
+  visibility: hidden;
+  transition:
+    grid-template-columns 0.45s var(--ease-out),
+    opacity 0.3s var(--ease-out),
+    transform 0.5s var(--ease-out),
+    visibility 0s linear 0.45s;
+}
+
+/* ---------- Фон ---------- */
+
+.backdrop {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 60% at 20% 15%, rgba(255, 92, 138, 0.32), transparent 70%),
+    radial-gradient(50% 55% at 85% 80%, rgba(110, 80, 255, 0.32), transparent 70%),
+    radial-gradient(40% 40% at 60% 30%, rgba(40, 180, 255, 0.16), transparent 70%),
+    var(--bg);
+}
+
+.backdrop-layer {
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  opacity: 0;
+  animation: backdrop-in 1.1s var(--ease-out) forwards;
+}
+
+/* картинка растянута за края, чтобы размытие не давало светлой рамки */
+.backdrop-layer.has-image {
+  inset: -12%;
+  background-position: center;
+  background-size: cover;
+  filter: blur(70px) saturate(1.5);
+}
+
+@keyframes backdrop-in {
+  to {
+    opacity: 1;
+  }
+}
+
+/* затемнение поверх фона: прозрачность = «Затемнение» песни (0–100%) */
+.backdrop-shade {
+  position: absolute;
+  inset: 0;
+  background: #08080e;
+  transition: opacity 0.3s var(--ease-out);
+}
+
+/* уменьшенная копия фона в редакторе Админ-панели */
+.backdrop--preview {
+  position: absolute;
+  z-index: 0;
+}
+
+/* ---------- Левое меню ---------- */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+  min-height: 0;
+  padding: 18px 12px;
+  overflow: hidden;
+}
+
+/* подписи плавно гаснут при сворачивании (меняется только opacity) */
+.fade-label {
+  white-space: nowrap;
+  transition: opacity 0.25s var(--ease-out);
+}
+
+.sidebar.is-collapsed .fade-label {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 10px;
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.brand-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff6a88, #8a4bff 60%, #465aff);
+  box-shadow:
+    0 6px 18px rgba(138, 75, 255, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  font-size: 18px;
+}
+
+.nav {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 46px;
+  /* (78 − 2×12) / 2 − 11 = 16: в свёрнутом меню иконка ровно по центру */
+  padding: 0 16px;
+  overflow: hidden;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    transform 0.35s var(--ease-spring);
+}
+
+.nav-item:hover,
+.nav-item.is-active {
+  color: var(--text);
+}
+
+.nav-item:active {
+  transform: scale(0.97);
+}
+
+.nav-item svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.nav-badge {
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* стеклянная «капля» под активным пунктом — переезжает с пружинкой */
+.nav-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.08));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: transform 0.55s var(--ease-spring);
+}
+
+.sidebar-toggle {
+  flex: none;
+  margin-top: auto;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* в свёрнутом меню значок разворачивается «стрелкой наружу» */
+.sidebar-toggle svg {
+  transition: transform 0.45s var(--ease-spring);
+}
+
+.sidebar.is-collapsed .sidebar-toggle svg {
+  transform: scaleX(-1);
+}
+
+.sidebar-footer {
+  margin-top: -14px;
+  padding: 0 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* ---------- Зона (центральная панель) ---------- */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 26px 28px 0;
+  overflow: hidden;
+}
+
+/* ---------- Нижняя панель плеера ---------- */
+
+.player-bar {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(340px, 1.5fr) minmax(200px, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 10px 16px;
+  border-radius: 24px;
+}
+
+.bar-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin: -6px;
+  padding: 6px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.bar-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.bar-track:not(:disabled):hover::before {
+  opacity: 1;
+}
+
+.bar-track:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.bar-track:disabled {
+  cursor: default;
+}
+
+.bar-cover {
+  flex: none;
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.bar-meta {
+  position: relative;
+  min-width: 0;
+}
+
+.bar-title,
+.bar-artist {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bar-title {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.bar-artist {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.bar-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.bar-center .progress {
+  width: 100%;
+}
+
+.bar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.bar-right .volume {
+  width: 170px;
+  margin: 0;
+}
+
+/* ---------- Полноэкранный плеер ---------- */
+
+.now-playing {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(5%) scale(0.98);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.35s var(--ease-out),
+    transform 0.6s var(--ease-spring),
+    visibility 0s linear 0.6s;
+}
+
+.now-playing.is-open {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 0.35s var(--ease-out),
+    transform 0.6s var(--ease-spring),
+    visibility 0s;
+}
+
+.backdrop--immersive {
+  position: absolute;
+  z-index: 0;
+}
+
+.now-playing-close {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  left: 18px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.now-playing-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 56px;
+  min-height: 0;
+  padding: 56px 64px 40px;
+}
+
+.np-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  min-width: 0;
+}
+
+.np-cover {
+  width: min(50vh, 440px, 100%);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 22px;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.55);
+  transition: transform 0.6s var(--ease-spring);
+}
+
+/* как в Apple Music: на паузе обложка чуть уменьшается */
+.np-cover.is-paused {
+  transform: scale(0.86);
+}
+
+.np-meta {
+  max-width: 100%;
+  text-align: center;
+}
+
+.np-title,
+.np-artist {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.np-title {
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.np-artist {
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.np-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(440px, 100%);
+}
+
+/* правая половина полноэкранного плеера — текст песни (стили в lyrics.css) */
+.np-lyrics {
+  position: relative;
+  height: min(78vh, 720px);
+  min-width: 0;
+}
+
+@media (max-width: 1000px) {
+  .now-playing-body {
+    grid-template-columns: 1fr;
+  }
+
+  .np-lyrics {
+    display: none;
+  }
+}

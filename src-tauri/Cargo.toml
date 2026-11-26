@@ -1,0 +1,61 @@
+[package]
+name = "liquid-player"
+version = "0.6.0"
+description = "Музыкальный плеер в стиле Liquid Glass"
+edition = "2021"
+
+# Вся логика живёт в библиотеке (lib.rs), а main.rs только её запускает.
+# Суффикс _lib нужен на Windows: иначе .pdb-файлы бинарника и библиотеки
+# получают одинаковое имя и конфликтуют.
+[lib]
+name = "liquid_player_lib"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# protocol-asset — интерфейс может показывать картинки из папки данных (обложки, фоны)
+tauri = { version = "2", features = ["protocol-asset"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Звук: rodio выводит звук, symphonia (внутри rodio) декодирует файлы потоково.
+# default-features = false — отключаем ненужное (запись с микрофона и т.п.).
+rodio = { version = "0.23", default-features = false, features = [
+    "playback",       # вывод на звуковую карту
+    "mp3",
+    "flac",
+    "vorbis",         # .ogg
+    "wav",
+    "mp4",            # .m4a с AAC
+    "symphonia-alac", # .m4a без потерь (Apple Lossless)
+] }
+
+# Теги (название, исполнитель, альбом) и встроенные обложки
+lofty = "0.25"
+
+# Системный диалог выбора файлов, папок и картинок
+tauri-plugin-dialog = "2"
+
+# База данных SQLite. bundled — SQLite компилируется прямо в .exe, ставить ничего не нужно
+rusqlite = { version = "0.42", features = ["bundled"] }
+
+# Чтение и сжатие картинок (только нужные форматы, без лишнего)
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "bmp", "gif"] }
+
+# Очень быстрый хеш для идентификатора трека
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+# Обход папок со всеми подпапками
+walkdir = "2"
+
+# HTTP-запросы к lrclib.net за текстами песен.
+# native-tls — встроенное в Windows шифрование (SChannel): ничего лишнего собирать не нужно.
+# query — параметры ?track_name=…, json — разбор ответа, system-proxy — прокси из настроек Windows.
+reqwest = { version = "0.13", default-features = false, features = ["native-tls", "json", "query", "system-proxy"] }
+
+# Зависимости (декодеры) собираем с оптимизацией даже в debug-режиме:
+# неоптимизированная symphonia декодирует в 10–20 раз медленнее, и звук может заикаться.
+# Наш собственный код при этом остаётся быстрым в компиляции.
+[profile.dev.package."*"]
+opt-level = 3

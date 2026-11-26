@@ -1,0 +1,474 @@
+/* ==========================================================================
+   Тексты песен: полноэкранный плеер и раздел «Текст песни» в Админ-панели.
+   ========================================================================== */
+
+/* ---------- Полноэкранный плеер ---------- */
+
+.lyrics {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  /* строки плавно растворяются сверху и снизу */
+  mask-image: linear-gradient(transparent, #000 14%, #000 80%, transparent);
+}
+
+.lyrics-track {
+  padding: 0 12px;
+  will-change: transform;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* пока крутят колесом — список следует за колесом без задержки */
+.lyrics-track.is-free {
+  transition-duration: 0.15s;
+}
+
+.lyric-line {
+  margin-bottom: 0.7em;
+  color: #fff;
+  font-size: clamp(22px, 2.3vw, 34px);
+  font-weight: 750;
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  opacity: 0.3;
+  filter: blur(1.3px);
+  transform: scale(0.94);
+  transform-origin: left center;
+  cursor: pointer;
+  transition:
+    transform 0.6s var(--ease-out),
+    opacity 0.45s var(--ease-out),
+    filter 0.45s var(--ease-out);
+}
+
+.lyric-line.is-past {
+  opacity: 0.2;
+}
+
+.lyric-line:hover {
+  opacity: 0.7;
+  filter: none;
+}
+
+.lyric-line.is-active {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  text-shadow: 0 0 34px rgba(255, 255, 255, 0.28);
+}
+
+/* пословная подсветка (enhanced LRC): спетые слова яркие, остальные — тусклее */
+.lyric-line.is-active span {
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.lyric-line.is-active span.is-sung {
+  opacity: 1;
+}
+
+/* сдвиг синхронизации — появляется при наведении на текст */
+.lyrics-offset {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: rgba(20, 20, 28, 0.55);
+  backdrop-filter: blur(16px);
+  font-size: 12px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.25s,
+    transform 0.35s var(--ease-spring);
+}
+
+.lyrics:hover .lyrics-offset {
+  opacity: 1;
+  transform: none;
+}
+
+.lyrics-offset button {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.lyrics-offset button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.lyrics-offset span {
+  min-width: 64px;
+  color: var(--text-muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.lyrics-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+}
+
+.lyrics-message p {
+  max-width: 360px;
+  margin: 0;
+}
+
+.lyrics-message-icon {
+  width: 40px;
+  height: 40px;
+  opacity: 0.55;
+}
+
+.lyrics-message-title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.lyrics-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.lyrics-plain {
+  height: 100%;
+  overflow-y: auto;
+  padding: 10% 12px 30%;
+  font-size: clamp(18px, 1.6vw, 24px);
+  font-weight: 650;
+  line-height: 1.45;
+  mask-image: linear-gradient(transparent, #000 8%, #000 85%, transparent);
+}
+
+.lyrics-plain p {
+  margin: 0;
+}
+
+.lyrics-plain-note {
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* кнопка «Текст» в нижней панели: ярче, если текст есть */
+.lyrics-btn {
+  color: var(--text-muted);
+}
+
+.lyrics-btn.has-lyrics {
+  color: var(--text);
+}
+
+/* ---------- Админ-панель: раздел «Текст песни» ---------- */
+
+.section-chips {
+  margin-left: auto;
+}
+
+.section-chips .chip {
+  margin-left: 0;
+}
+
+.lyrics-preview {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 13px;
+  user-select: text;
+}
+
+.lyrics-preview-line {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.lyrics-preview-time {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.lyrics-preview-plain {
+  white-space: pre-wrap;
+}
+
+.lyrics-preview-empty {
+  padding: 8px 0;
+}
+
+.offset-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.offset-row .pill-btn {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.offset-value {
+  min-width: 56px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.offset-hint {
+  font-size: 12px;
+}
+
+/* общие поля ввода */
+.lyrics-search-form input,
+.lyrics-textarea,
+.info-form input {
+  min-width: 0;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  user-select: text;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.lyrics-search-form input:focus,
+.lyrics-textarea:focus,
+.info-form input:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lyrics-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+  gap: 8px;
+}
+
+.candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.candidate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.candidate-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.candidate-title,
+.candidate-preview {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.candidate-title {
+  font-weight: 650;
+}
+
+.candidate-preview {
+  font-size: 12px;
+}
+
+.chip--ok {
+  background: rgba(74, 222, 128, 0.16);
+  color: #86efac;
+}
+
+.lyrics-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 280px;
+  padding: 10px 12px;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+kbd {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.13);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12px;
+}
+
+/* ручная разметка */
+.tap-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.tap-mark {
+  min-width: 190px;
+}
+
+.tap-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.tap-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.tap-line {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.tap-line.is-done {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tap-line.is-next {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  font-weight: 650;
+}
+
+.tap-time {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* быстрые переходы к разделам редактора */
+.editor-jumps {
+  display: flex;
+  gap: 14px;
+  padding-top: 4px;
+  font-size: 12px;
+}
+
+.editor-jumps .link-btn {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.editor-jumps .link-btn:hover {
+  color: var(--text);
+}
+
+.editor-section {
+  scroll-margin-top: 4px;
+}
+
+/* правка названия и исполнителя */
+.editor-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.info-reset {
+  margin-left: 10px;
+  font-size: 12px;
+}
+
+.info-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-form label {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.info-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.info-note {
+  font-size: 12px;
+}
+
+/* карточка «Тексты песен» на вкладке «Добавить музыку» */
+.lyrics-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+}
+
+.inline-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  vertical-align: -3px;
+}

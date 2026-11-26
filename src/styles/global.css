@@ -1,0 +1,419 @@
+/* ==========================================================================
+   Дизайн-токены и базовые элементы (кнопки, стекло, чипы, уведомления).
+   Все цвета, радиусы и easing — переменные: на этапе 6 акцент (--accent)
+   будет подстраиваться под цвета обложки.
+   Анимируем только transform и opacity — их считает видеокарта.
+   ========================================================================== */
+
+:root {
+  --bg: #0b0b12;
+  --text: rgba(255, 255, 255, 0.94);
+  --text-muted: rgba(255, 255, 255, 0.56);
+  --accent: #ff5c8a;
+  --danger: #f87171;
+  --warn: #fbbf24;
+
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-blur: 32px;
+
+  --radius-l: 28px;
+  --radius-m: 18px;
+  --radius-s: 12px;
+
+  /* spring-подобная кривая: лёгкий «перелёт» и возврат */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --font: "Inter Variable", "SF Pro Display", "Segoe UI Variable Display", "Segoe UI",
+    system-ui, sans-serif;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  /* приложение, а не веб-страница: текст интерфейса не выделяется мышью */
+  user-select: none;
+  cursor: default;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.selectable {
+  user-select: text;
+  cursor: text;
+}
+
+/* тонкие стеклянные полосы прокрутки */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14) padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.26);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ---------- Стекло ---------- */
+
+/* Большие панели: размывают фон под собой */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-l);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Карточки внутри панелей — без размытия (вложенное размытие дорого и не видно) */
+.glass-card {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-m);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- Обложка ---------- */
+
+.cover {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-s);
+  background: rgba(255, 255, 255, 0.08);
+  container-type: inline-size;
+}
+
+/* картинка растянута на всю рамку и обрезана по центру — и для квадратных,
+   и для вытянутых картинок (position: absolute даёт точную высоту рамки) */
+.cover img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-note {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 44cqw;
+  line-height: 1;
+}
+
+/* ---------- Кнопки ---------- */
+
+.icon-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 0.4s var(--ease-spring),
+    opacity 0.2s,
+    color 0.2s;
+}
+
+/* подсветка при наведении — отдельный слой, у которого меняется только opacity */
+.icon-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.icon-btn:not(:disabled):hover {
+  transform: scale(1.08);
+}
+
+.icon-btn:not(:disabled):hover::before {
+  opacity: 1;
+}
+
+.icon-btn:not(:disabled):active {
+  transform: scale(0.88);
+  transition-duration: 0.12s;
+}
+
+.icon-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.icon-btn svg {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+.icon-btn--small {
+  width: 36px;
+  height: 36px;
+}
+
+.icon-btn--small svg {
+  width: 21px;
+  height: 21px;
+}
+
+.icon-btn--tiny {
+  width: 28px;
+  height: 28px;
+}
+
+.icon-btn--tiny svg {
+  width: 15px;
+  height: 15px;
+}
+
+.pill-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform 0.4s var(--ease-spring),
+    opacity 0.2s;
+}
+
+.pill-btn:not(:disabled):hover {
+  transform: scale(1.04);
+}
+
+.pill-btn:not(:disabled):active {
+  transform: scale(0.95);
+  transition-duration: 0.12s;
+}
+
+.pill-btn:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+.pill-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.pill-btn--accent {
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.95);
+  color: #111118;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
+}
+
+.pill-btn--danger {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(248, 113, 113, 0.2);
+  color: #fecaca;
+}
+
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Чипы и индикаторы ---------- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chip--warn {
+  background: rgba(251, 191, 36, 0.16);
+  color: var(--warn);
+}
+
+.chip--soon {
+  background: rgba(167, 139, 250, 0.18);
+  color: #c4b5fd;
+}
+
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 10px #4ade80;
+}
+
+.dot--error {
+  background: var(--danger);
+  box-shadow: 0 0 10px var(--danger);
+}
+
+/* ---------- Всплывающие сообщения ---------- */
+
+.toast {
+  position: fixed;
+  z-index: 50;
+  bottom: 122px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(620px, 90vw);
+  padding: 10px 10px 10px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: rgba(20, 20, 28, 0.72);
+  backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+  transform: translateX(-50%);
+  animation: toast-in 0.5s var(--ease-spring);
+}
+
+.toast-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px) scale(0.95);
+  }
+}
+
+/* ---------- Перетаскивание файлов ---------- */
+
+.drop-overlay {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(10, 10, 16, 0.5);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s var(--ease-out);
+}
+
+.drop-overlay.is-visible {
+  opacity: 1;
+}
+
+.drop-overlay-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  border: 2px dashed rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-l);
+  transform: scale(0.97);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.drop-overlay.is-visible .drop-overlay-box {
+  transform: scale(1);
+}
+
+.drop-overlay-title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* ---------- Появление зоны / вкладки ---------- */
+
+.view-enter {
+  animation: view-in 0.45s var(--ease-out);
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}

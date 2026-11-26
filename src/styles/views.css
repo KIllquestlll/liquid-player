@@ -1,0 +1,947 @@
+/* ==========================================================================
+   Зоны: «Главная», «Моя музыка», «Админ-панель».
+   ========================================================================== */
+
+.view {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+  overflow-y: auto;
+  /* полоса прокрутки — у самого края панели */
+  margin-right: -14px;
+  padding: 0 14px 26px 0;
+}
+
+.view-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.view-title {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.view-subtitle {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.view-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ---------- Поиск ---------- */
+
+.search {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 10px 0 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.search:focus-within {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 13px;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  user-select: text;
+}
+
+.search input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search-clear {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+}
+
+.search-clear svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ---------- Пустые состояния ---------- */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 440px;
+  margin: auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.empty-state-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+.empty-state h2 {
+  margin: 8px 0 0;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.empty-state p {
+  margin: 0 0 8px;
+}
+
+/* ---------- Моя музыка ---------- */
+
+.music-view {
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+/* поиск + сортировка в одну строку */
+.music-toolbar {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.music-toolbar .search {
+  flex: 1 1 260px;
+}
+
+.sort-dir {
+  height: 44px;
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 13px;
+}
+
+/* стрелка направления: вниз — убывание, вверх — возрастание */
+.sort-dir svg,
+.sort-header svg {
+  transition: transform 0.4s var(--ease-spring);
+}
+
+svg.is-up {
+  transform: rotate(180deg);
+}
+
+.sort-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.sort-header:hover,
+.sort-header.is-active {
+  color: var(--text);
+}
+
+.sort-header svg {
+  width: 13px;
+  height: 13px;
+}
+
+.track-head .col-time {
+  justify-self: end;
+}
+
+.track-table {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0 -12px;
+}
+
+.track-head,
+.track-row {
+  display: grid;
+  /* последняя колонка — кнопки «+» и «карандаш» */
+  grid-template-columns: 44px minmax(0, 2.2fr) minmax(0, 1.3fr) 60px 64px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+}
+
+.track-head {
+  flex: none;
+  height: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.track-list {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 12px;
+}
+
+.vlist {
+  position: relative;
+  overflow-y: auto;
+}
+
+.vlist-inner {
+  position: relative;
+}
+
+.vlist-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.track-row {
+  height: 100%;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.track-row:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.track-row.is-current {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.track-row.is-current .row-title {
+  color: var(--accent);
+}
+
+.track-row.is-missing {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.col-index {
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.index-play {
+  display: none;
+  width: 16px;
+  height: 16px;
+  color: var(--text);
+}
+
+.track-row:not(.is-missing):hover .index-num {
+  display: none;
+}
+
+.track-row:not(.is-missing):hover .index-play {
+  display: block;
+}
+
+.col-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.row-cover {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+}
+
+.row-text {
+  min-width: 0;
+}
+
+.row-title,
+.row-artist,
+.col-album {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.row-artist,
+.col-album {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.col-time {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.col-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.track-row:hover .col-actions {
+  opacity: 1;
+}
+
+.list-empty {
+  padding: 40px;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .track-head,
+  .track-row {
+    grid-template-columns: 44px minmax(0, 1fr) 60px 64px;
+  }
+
+  .col-album {
+    display: none;
+  }
+}
+
+/* ---------- Админ-панель ---------- */
+
+.admin-view {
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.admin-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-right: -14px;
+  padding: 0 14px 26px 0;
+}
+
+.admin-body--tracks {
+  overflow: hidden;
+  padding-bottom: 18px;
+}
+
+/* переключатель вкладок */
+.segmented {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--count), 1fr);
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.segmented-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 8px) / var(--count));
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.5s var(--ease-spring);
+}
+
+.segmented-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.segmented-item.is-active {
+  color: var(--text);
+}
+
+.segmented-item svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* — Добавить музыку — */
+
+.admin-import {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  border: 2px dashed rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-l);
+  background: rgba(255, 255, 255, 0.03);
+  text-align: center;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s,
+    transform 0.4s var(--ease-spring);
+}
+
+.dropzone.is-hover {
+  border-color: var(--accent);
+  background: rgba(255, 92, 138, 0.08);
+  transform: scale(1.01);
+}
+
+.dropzone-icon {
+  width: 46px;
+  height: 46px;
+  margin-bottom: 4px;
+  color: var(--text-muted);
+}
+
+.dropzone-title {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.dropzone-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.import-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.import-card-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+}
+
+.import-current {
+  max-width: 60%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.import-errors {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.import-errors li {
+  overflow: hidden;
+  padding: 3px 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.import-error-file {
+  color: #fecaca;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px 18px;
+}
+
+.stat-value {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  margin-bottom: 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.stat--warn .stat-value {
+  color: var(--warn);
+}
+
+/* — Треки и оформление — */
+
+.admin-tracks {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  gap: 16px;
+  height: 100%;
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 10px;
+}
+
+.mini-list {
+  flex: 1;
+  min-height: 0;
+}
+
+.mini-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 52px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.mini-row:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.mini-row.is-selected {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.mini-row .row-text {
+  flex: 1;
+}
+
+.mini-cover {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+}
+
+.mini-flag {
+  display: grid;
+  color: var(--text-muted);
+}
+
+.mini-flag svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mini-flag--warn {
+  color: var(--warn);
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.editor-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.editor-placeholder svg {
+  width: 40px;
+  height: 40px;
+}
+
+.editor-head {
+  display: flex;
+  gap: 20px;
+  padding: 18px;
+}
+
+.editor-cover {
+  flex: none;
+  width: 150px;
+  height: 150px;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.editor-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.editor-title {
+  overflow: hidden;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.editor-artist {
+  font-size: 15px;
+}
+
+.editor-path {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+/* «Обложка» и «Текст песни» рядом, «Фон» — во всю ширину под ними */
+.editor-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.editor-section--full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 1150px) {
+  .editor-sections {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.section-head .chip {
+  margin-left: auto;
+}
+
+.section-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.section-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.section-text {
+  margin: 0;
+  font-size: 13px;
+}
+
+.section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* раздел ещё не готов (наполнят этапы 4 и 5) */
+.editor-section.is-locked .section-body {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.section-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-thumb {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+}
+
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.section-actions .pill-btn {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.section-actions--column {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.section-actions--column .pill-btn {
+  justify-content: flex-start;
+}
+
+/* — Обложка — */
+
+.cover-edit {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cover-edit-preview {
+  flex: none;
+  width: 104px;
+  height: 104px;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+}
+
+/* — Фон — */
+
+.bg-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+}
+
+/* уменьшенная копия окна: тот же фон, то же затемнение, размытие в масштабе */
+.bg-preview {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.bg-preview-sample {
+  position: absolute;
+  z-index: 1;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bg-preview-cover {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.bg-preview-text {
+  min-width: 0;
+}
+
+.bg-preview-title,
+.bg-preview-artist {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bg-preview-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.bg-preview-artist {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+.bg-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.look-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.look-value {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.bg-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.link-btn:disabled {
+  color: var(--text-muted);
+  text-decoration: none;
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (max-width: 1250px) {
+  .bg-editor {
+    grid-template-columns: 1fr;
+  }
+}

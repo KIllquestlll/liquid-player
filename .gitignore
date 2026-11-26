@@ -1,0 +1,19 @@
+# Node / Vite
+node_modules/
+dist/
+*.log
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Локальные настройки сборки (путь к папке сборки на конкретном компьютере).
+# Пример — в .cargo/config.toml.example
+.cargo/config.toml
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
